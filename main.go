@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
+	"github.com/thinkerajay/tracker-service/config"
+	"github.com/thinkerajay/tracker-service/db_service"
 	"log"
 	"os"
+	"os/signal"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
@@ -10,26 +14,23 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
-
 	if port == "" {
-		log.Fatal("$PORT must be set")
+		log.Println("$PORT must be set")
 	}
-
+	port = "6985"
 	router := gin.New()
-	router.Use(gin.Logger())
-	router.LoadHTMLGlob("templates/*.tmpl.html")
-	router.Static("/static", "static")
-
-	router.GET("/", func(c *gin.Context) {
-		userId, err := c.Cookie("_tsuid")
-		if err != nil {
-			c.SetCookie("_tsuid", "random_id", 9000, "/", "heroku.com", true, true)
-		}
-		log.Println(userId)
-		c.JSON(200, userId)
-
-	})
-
-	router.Run(":" + port)
+	config.ConfigureRouter(router)
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	ctx, cancel := context.WithCancel(context.Background())
+	go db_service.Consume(ctx)
+	go func (){
+		log.Fatalln(router.Run(":" + port))
+	}()
+	select{
+	case <- signals:
+		cancel()
+		log.Println("SigTerm, exiting the application !")
+	}
 
 }
