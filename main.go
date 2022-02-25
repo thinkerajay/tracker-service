@@ -21,7 +21,12 @@ func main() {
 	router.Static("/static", "static")
 
 	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, "success")
+		userId, err := c.Cookie("_tsuid")
+		if err != nil {
+			c.SetCookie("_tsuid", "random_id", 9000, "/", "localhost", true, true)
+		}
+		log.Println(userId)
+		c.JSON(200, userId)
 
 	})
 
