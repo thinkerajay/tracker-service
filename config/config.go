@@ -5,6 +5,7 @@ import (
 	"github.com/thinkerajay/tracker-service/handlers"
 )
 
+
 func ConfigureRouter(router *gin.Engine){
 	router.Use(gin.Logger())
 	router.LoadHTMLGlob("templates/*.tmpl.html")
