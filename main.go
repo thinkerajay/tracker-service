@@ -23,7 +23,7 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		userId, err := c.Cookie("_tsuid")
 		if err != nil {
-			c.SetCookie("_tsuid", "random_id", 9000, "/", "localhost", true, true)
+			c.SetCookie("_tsuid", "random_id", 9000, "/", "herokuapp.com", true, true)
 		}
 		log.Println(userId)
 		c.JSON(200, userId)
