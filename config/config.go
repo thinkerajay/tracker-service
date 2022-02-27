@@ -11,7 +11,8 @@ func ConfigureRouter(router *gin.Engine){
 	router.LoadHTMLGlob("templates/*.tmpl.html")
 	router.Static("/static", "static")
 
-	router.GET("/views", handlers.ViewsHandler)
+	router.GET("/awesome-page/views", handlers.ViewsHandler)
+	router.GET("/api/v1/awesome-page/views", handlers.ViewsApiHandler)
 
 	router.GET("/", handlers.HomePageHandler)
 	router.GET("/awesome-page",handlers.AwesomePageHandler)

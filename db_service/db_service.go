@@ -32,16 +32,28 @@ func init() {
 func FetchViewsCount(startDate string, endDate string)(int64, error){
 	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
 
-	records, err := collection.CountDocuments(ctx, bson.M{"created_at":bson.M{"$gt": startDate, "$lt": endDate}})
+	recordsCount, err := collection.CountDocuments(ctx, bson.M{"created_at":bson.M{"$gt": startDate, "$lt": endDate}})
 	if err != nil{
 		log.Println(err)
 		return 0,err
 	}
 
-	return records, nil
+	return recordsCount, nil
+}
+func FetchDistinctUsersCount(startDate string, endDate string)(int64, error){
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+
+	distinctUsers, err := collection.Distinct(ctx, "user_id",  bson.M{"created_at":bson.M{"$gt": startDate, "$lt": endDate}})
+	if err != nil{
+		log.Println(err)
+		return 0,err
+	}
+
+	return int64(len(distinctUsers)), nil
 }
 
-func Consume(ctx context.Context) {
+
+func ConsumePageViewEvents(ctx context.Context) {
 	consumer, err := sarama.NewConsumer([]string{"localhost:9092"}, nil)
 	//writeCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	if err != nil {

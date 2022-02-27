@@ -43,37 +43,74 @@ func AwesomePageHandler(ctx *gin.Context) {
 
 }
 
-func ViewsHandler(ctx *gin.Context) {
+func ViewsApiHandler(ctx *gin.Context) {
 	startDateString := ctx.Query("startDate")
+	endDateString := ctx.Query("endDate")
 
 	var startDate string
-	dateFormat := "2006-01-02"
-
-	startDateTime, err := time.Parse(dateFormat, startDateString)
-	startDate = startDateTime.Format(dateFormat)
-	if err != nil || startDateString == "" {
-		log.Println(err)
-		startDate = time.Now().Format(dateFormat)
-	}
-
 	var endDate string
 
-	endDateString := ctx.Query("endDate")
-	endDateTime, err := time.Parse(dateFormat, endDateString)
-	endDate = endDateTime.Format(dateFormat)
-	if err != nil || endDateString == "" {
-		endDate = time.Now().Add(time.Hour * 24).Format(dateFormat)
+	dateFormat := "2006-01-02"
+
+	if startDateString == "" {
+		startDate = time.Now().Format(dateFormat)
+	} else {
+		startDateTime, _ := time.Parse(dateFormat, startDateString)
+		startDate = startDateTime.Format(dateFormat)
 	}
-	log.Println(startDate)
-	log.Println(endDate)
+	if endDateString == "" {
+		endDate = time.Now().Add(time.Hour * 24).Format(dateFormat)
+	} else {
+		endDateTime, _ := time.Parse(dateFormat, endDateString)
+		endDate = endDateTime.Format(dateFormat)
+	}
+
 	viewsCount, err := db_service.FetchViewsCount(startDate, endDate)
+	uniqueUsers, err := db_service.FetchDistinctUsersCount(startDate, endDate)
 	if err != nil {
 		log.Println(err)
 	}
 
-	ctx.HTML(200,"views_counter.tmpl.html", map[string]interface{}{
-		"views":     viewsCount,
-		"startDate": startDate,
-		"endDate":   endDate,
+	ctx.JSON(200, map[string]interface{}{
+		"views":       viewsCount,
+		"startDate":   startDate,
+		"endDate":     endDate,
+		"uniqueUsers": uniqueUsers,
+	})
+}
+
+func ViewsHandler(ctx *gin.Context) {
+	startDateString := ctx.Query("startDate")
+	endDateString := ctx.Query("endDate")
+
+	var startDate string
+	var endDate string
+
+	dateFormat := "2006-01-02"
+
+	if startDateString == "" {
+		startDate = time.Now().Format(dateFormat)
+	} else {
+		startDateTime, _ := time.Parse(dateFormat, startDateString)
+		startDate = startDateTime.Format(dateFormat)
+	}
+	if endDateString == "" {
+		endDate = time.Now().Add(time.Hour * 24).Format(dateFormat)
+	} else {
+		endDateTime, _ := time.Parse(dateFormat, endDateString)
+		endDate = endDateTime.Format(dateFormat)
+	}
+
+	viewsCount, err := db_service.FetchViewsCount(startDate, endDate)
+	uniqueUsers, err := db_service.FetchDistinctUsersCount(startDate, endDate)
+	if err != nil {
+		log.Println(err)
+	}
+
+	ctx.HTML(200, "views_counter.tmpl.html", map[string]interface{}{
+		"views":       viewsCount,
+		"startDate":   startDate,
+		"endDate":     endDate,
+		"uniqueUsers": uniqueUsers,
 	})
 }
