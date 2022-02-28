@@ -1,6 +1,7 @@
 # tracker-service
-webpage views tracker service. Written using gin web framework and uses kafka as message queue and mongodb as document store.
+A microservice to track webpage views. Written using gin web framework and uses kafka as message queue and mongodb as document store.
 
+### handlers
 http://localhost:6985/awesome-page has a 10X10 pixel which fires/mimicks as pixel fire and gin handlers pushes the view event to kafka topic.
 http://localhost:6985/awesome-page/views gives overall stats of the total views and unique users based on the query params passed to the http call.
 
