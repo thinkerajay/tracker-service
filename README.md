@@ -1,5 +1,5 @@
 # tracker-service
-user page view tracker service
+user page views tracker service
 
 ### pre-requisites
 #### 1. Zookeeper
@@ -10,5 +10,5 @@ user page view tracker service
 
 
 ### How to run the application
-#### 1. go build & ./tracker-service
+#### 1. go build & ./tracker-service (OR)
 #### 2. go run main.go
